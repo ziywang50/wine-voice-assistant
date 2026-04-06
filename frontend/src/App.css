@@ -1,0 +1,285 @@
+/* ── Layout ── */
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+  min-height: 100dvh;
+}
+
+/* ── Header ── */
+.app-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.logo {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5));
+}
+
+.app-header h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(201, 168, 76, 0.3);
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--cream-dim);
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* ── Main ── */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ── Transcript ── */
+.transcript-area {
+  width: 100%;
+  min-height: 3.5rem;
+  background: var(--surface);
+  border: 1px solid var(--burgundy-light);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+.placeholder-text {
+  color: var(--cream-dim);
+  font-style: italic;
+  font-size: 0.95rem;
+  opacity: 0.6;
+}
+
+.transcript-text {
+  color: var(--cream);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* ── Mic section ── */
+.mic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ── Mic wrapper (pulse ring) ── */
+.mic-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+}
+
+.mic-wrapper.recording::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 3px solid var(--burgundy-light);
+  animation: pulse-ring 1.2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.mic-wrapper.speaking::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  animation: pulse-ring 1.6s ease-in-out infinite;
+}
+
+/* ── Mic button ── */
+.mic-btn {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.mic-btn svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Idle */
+.mic-btn.idle {
+  background: var(--burgundy-mid);
+  box-shadow: 0 4px 24px rgba(90, 26, 42, 0.6), 0 0 0 2px var(--burgundy-light);
+  color: var(--cream);
+}
+.mic-btn.idle:hover {
+  background: var(--burgundy-light);
+  transform: scale(1.05);
+  box-shadow: 0 6px 32px rgba(139, 42, 63, 0.7), 0 0 0 2px var(--gold);
+}
+.mic-btn.idle:active {
+  transform: scale(0.97);
+}
+
+/* Recording */
+.mic-btn.recording {
+  background: #8b1a1a;
+  box-shadow: 0 4px 28px rgba(139, 26, 26, 0.8), 0 0 0 2px #c0392b;
+  color: #fff;
+}
+.mic-btn.recording:hover {
+  background: #a32020;
+}
+
+/* Transcribing / Thinking */
+.mic-btn.transcribing,
+.mic-btn.thinking {
+  background: var(--surface-2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  color: var(--cream-dim);
+  cursor: not-allowed;
+}
+
+/* Speaking */
+.mic-btn.speaking {
+  background: var(--burgundy-deep);
+  box-shadow: 0 4px 24px rgba(201, 168, 76, 0.3), 0 0 0 2px var(--gold);
+  color: var(--gold);
+  cursor: not-allowed;
+}
+
+/* Error */
+.mic-btn.error {
+  background: #3d1010;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 2px #8b2020;
+  color: #e07070;
+}
+
+.mic-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* Spinner animation */
+.spinner {
+  animation: spin 0.9s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Cancel button ── */
+.cancel-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--cream-dim);
+  background: var(--surface-2);
+  color: var(--cream-dim);
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.cancel-btn:hover {
+  background: #8b1a1a;
+  color: #fff;
+  border-color: #c0392b;
+}
+
+/* ── Status label ── */
+.status-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: system-ui, sans-serif;
+}
+
+.status-label--idle       { color: var(--cream-dim); }
+.status-label--recording  { color: #e07070; }
+.status-label--transcribing,
+.status-label--thinking   { color: var(--cream-dim); }
+.status-label--speaking   { color: var(--gold-light); }
+.status-label--error      { color: #e07070; }
+
+/* ── Answer area ── */
+.answer-area {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--burgundy-light);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+}
+
+.answer-text {
+  color: var(--cream);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* ── Error block ── */
+.error-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.error-text {
+  color: #e07070;
+  font-size: 0.95rem;
+  font-family: system-ui, sans-serif;
+}
+
+.retry-btn {
+  padding: 0.45rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  transition: background 0.15s, color 0.15s;
+}
+
+.retry-btn:hover {
+  background: var(--gold);
+  color: var(--bg);
+}
