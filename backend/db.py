@@ -3,7 +3,6 @@ import json
 import os
 import requests
 import pandas as pd
-from io import StringIO
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "wines.db")
 CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "wines.csv")
@@ -155,11 +154,11 @@ def init_db() -> None:
     finally:
         conn.close()
 
-    _populate_filter_cache()
+    _load_valid_filters()
 
 
-def _populate_filter_cache() -> None:
-    """Cache distinct countries, regions, and varietals for pre-filtering."""
+def _load_valid_filters() -> None:
+    """Cache distinct countries, regions, appellations, and varietals for tool enum values."""
     conn = get_connection()
     try:
         cur = conn.cursor()
@@ -182,18 +181,38 @@ def get_filter_cache() -> dict:
     return _filter_cache
 
 
+ORDER_BY_MAP = {
+    "score": "top_score DESC NULLS LAST",
+    "price_asc": "price ASC",
+    "price_desc": "price DESC",
+}
+
+
 def query_wines(
+    name: str | None = None,
+    producer: str | None = None,
     price_min: float | None = None,
     price_max: float | None = None,
     color: str | None = None,
-    geo_term: str | None = None,
+    country: str | None = None,
+    region: str | None = None,
+    appellation: str | None = None,
     varietal: str | None = None,
-    order_by: str = "top_score DESC",
-    limit: int = 50,
+    vintage: str | None = None,
+    abv_min: float | None = None,
+    abv_max: float | None = None,
+    order_by: str = "score",
+    limit: int = 10,
 ) -> list[dict]:
     conditions = []
     params: list = []
 
+    if name:
+        conditions.append("LOWER(name) LIKE ?")
+        params.append(f"%{name.lower()}%")
+    if producer:
+        conditions.append("LOWER(producer) LIKE ?")
+        params.append(f"%{producer.lower()}%")
     if price_min is not None:
         conditions.append("price >= ?")
         params.append(price_min)
@@ -203,18 +222,31 @@ def query_wines(
     if color:
         conditions.append("LOWER(color) = ?")
         params.append(color.lower())
-    if geo_term:
-        pattern = f"%{geo_term}%"
-        conditions.append(
-            "(LOWER(country) LIKE ? OR LOWER(region) LIKE ? OR LOWER(appellation) LIKE ?)"
-        )
-        params.extend([pattern, pattern, pattern])
+    if country:
+        conditions.append("LOWER(country) = ?")
+        params.append(country.lower())
+    if region:
+        conditions.append("LOWER(region) LIKE ?")
+        params.append(f"%{region.lower()}%")
+    if appellation:
+        conditions.append("LOWER(appellation) LIKE ?")
+        params.append(f"%{appellation.lower()}%")
     if varietal:
         conditions.append("LOWER(varietal) LIKE ?")
         params.append(f"%{varietal.lower()}%")
+    if vintage:
+        conditions.append("vintage = ?")
+        params.append(vintage)
+    if abv_min is not None:
+        conditions.append("abv >= ?")
+        params.append(abv_min)
+    if abv_max is not None:
+        conditions.append("abv <= ?")
+        params.append(abv_max)
 
     where = "WHERE " + " AND ".join(conditions) if conditions else ""
-    sql = f"SELECT * FROM wines {where} ORDER BY {order_by} LIMIT ?"
+    sql_order = ORDER_BY_MAP.get(order_by, ORDER_BY_MAP["score"])
+    sql = f"SELECT * FROM wines {where} ORDER BY {sql_order} LIMIT ?"
     params.append(limit)
 
     conn = get_connection()
@@ -227,15 +259,12 @@ def query_wines(
         conn.close()
 
 
-def query_top_rated(limit: int = 100) -> list[dict]:
-    """Return top-rated wines as a fallback when no filters match."""
+def get_wine_by_id(wine_id: str) -> dict | None:
     conn = get_connection()
     try:
         cur = conn.cursor()
-        cur.execute(
-            "SELECT * FROM wines WHERE top_score IS NOT NULL ORDER BY top_score DESC LIMIT ?",
-            (limit,),
-        )
-        return [dict(r) for r in cur.fetchall()]
+        cur.execute("SELECT * FROM wines WHERE id = ?", (wine_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
     finally:
         conn.close()

@@ -14,6 +14,7 @@ export function useVoice() {
   const [status, setStatus] = useState('idle')
   const [transcript, setTranscript] = useState('')
   const [answer, setAnswer] = useState('')
+  const [audioBase64, setAudioBase64] = useState(null)
   const [error, setError] = useState(null)
 
   const mediaRecorderRef = useRef(null)
@@ -24,6 +25,7 @@ export function useVoice() {
   const reset = useCallback(() => {
     setTranscript('')
     setAnswer('')
+    setAudioBase64(null)
     setError(null)
     setStatus('idle')
   }, [])
@@ -145,6 +147,7 @@ export function useVoice() {
     }
 
     setAnswer(answerText)
+    setAudioBase64(audioBase64 ?? null)
 
     if (audioBase64) {
       setStatus('speaking')
@@ -177,6 +180,7 @@ export function useVoice() {
     status,
     transcript,
     answer,
+    audioBase64,
     error,
     toggleRecording,
     cancel,

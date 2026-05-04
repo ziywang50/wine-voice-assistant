@@ -28,7 +28,8 @@ OPENAI_API_KEY=your-openai-key
 ```bash
 cd wine-voice-assistant
 pip install -r backend/requirements.txt
-uvicorn backend.main:app --reload
+cd backend
+uvicorn main:app --reload
 ```
 
 The API will be available at `http://localhost:8000`. On first start it downloads the wine catalog CSV and initialises the SQLite database at `data/wines.db`.

@@ -6,7 +6,7 @@ import AnswerArea from './components/AnswerArea'
 import './App.css'
 
 export default function App() {
-  const { status, transcript, answer, error, toggleRecording, cancel, reset } = useVoice()
+  const { status, transcript, answer, audioBase64, error, toggleRecording, cancel, reset } = useVoice()
 
   return (
     <div className="app">
@@ -24,7 +24,7 @@ export default function App() {
           <StatusLabel status={status} />
         </div>
 
-        <AnswerArea answer={answer} error={error} status={status} onRetry={reset} />
+        <AnswerArea answer={answer} audioBase64={audioBase64} error={error} status={status} onRetry={reset} />
       </main>
     </div>
   )

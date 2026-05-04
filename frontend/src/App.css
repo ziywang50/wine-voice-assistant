@@ -238,12 +238,45 @@
 
 /* ── Answer area ── */
 .answer-area {
+  position: relative;
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--burgundy-light);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   text-align: left;
+}
+
+.replay-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.replay-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.replay-btn:hover {
+  background: rgba(201, 168, 76, 0.15);
+}
+
+.replay-btn--playing {
+  color: var(--gold-light);
+  cursor: not-allowed;
 }
 
 .answer-text {
